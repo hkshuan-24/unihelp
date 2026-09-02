@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
@@ -9,7 +9,7 @@ import Quiz from './pages/Quiz';
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/onboarding" element={<Onboarding />} />
@@ -19,7 +19,7 @@ function App() {
         <Route path="/planner" element={<Planner />} />
         <Route path="/quiz" element={<Quiz />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
