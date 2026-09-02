@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Brain, Send, User, GraduationCap, Lightbulb, HelpCircle } from 'lucide-react';
+import { Brain, Send, User, GraduationCap, Lightbulb, HelpCircle, Sparkles, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   id: string;
@@ -23,13 +24,29 @@ const aiResponses: Record<string, string> = {
     'Great question. Let me break this down for your current subject context (ECC1000 Microeconomics).\n\nThe key concept is that markets are efficient when marginal benefit equals marginal cost. Any intervention that moves quantity away from this equilibrium creates deadweight loss. The size depends on how sensitive supply and demand are to price changes — in other words, the elasticities.',
 };
 
+function TypingIndicator() {
+  return (
+    <div className="flex gap-3">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+        <Brain className="h-4 w-4 text-white" />
+      </div>
+      <div className="msg-assistant p-4 rounded-2xl rounded-bl-sm">
+        <div className="flex gap-1.5">
+          <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-2 h-2 rounded-full bg-white/40" />
+          <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }} className="w-2 h-2 rounded-full bg-white/40" />
+          <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }} className="w-2 h-2 rounded-full bg-white/40" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Tutor() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content:
-        "I'm your Grade Coach. I know you're studying ECC1000 Principles of Microeconomics at Monash. What would you like to explore today?",
+      content: "I'm your Grade Coach. I know you're studying ECC1000 Principles of Microeconomics at Monash. What would you like to explore today?",
     },
   ]);
   const [input, setInput] = useState('');
@@ -76,80 +93,78 @@ export default function Tutor() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-[#06060a] flex flex-col">
       {/* Header */}
-      <nav className="border-b bg-white">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+      <nav className="nav-glass">
+        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/dashboard"><GraduationCap className="h-6 w-6 text-indigo-600" /></Link>
+            <Link to="/dashboard" className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center hover:rotate-12 transition-transform">
+              <GraduationCap className="h-4 w-4 text-white" />
+            </Link>
             <div>
-              <div className="font-semibold">Grade Coach</div>
-              <div className="text-xs text-slate-500">ECC1000 · Microeconomics</div>
+              <div className="font-semibold text-white">Grade Coach</div>
+              <div className="text-xs text-white/30">ECC1000 · Microeconomics</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-xs text-slate-500">Online</span>
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-xs text-white/30">Online</span>
           </div>
         </div>
       </nav>
 
       {/* Messages */}
       <div className="flex-1 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 py-6 space-y-6 h-[calc(100vh-180px)] overflow-y-auto">
-          {messages.map(msg => (
-            <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
-                  <Brain className="h-4 w-4 text-white" />
-                </div>
-              )}
-              <div className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-white border rounded-bl-sm'}`}>
-                <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+        <div className="max-w-4xl mx-auto px-6 py-6 space-y-6 h-[calc(100vh-180px)] overflow-y-auto">
+          <AnimatePresence>
+            {messages.map(msg => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 {msg.role === 'assistant' && (
-                  <div className="mt-3 flex gap-2">
-                    <button onClick={handleDontGetIt} className="text-xs px-3 py-1.5 border rounded-full hover:bg-slate-50 flex items-center gap-1">
-                      <HelpCircle className="h-3 w-3" /> I still don't get it
-                    </button>
-                    <button className="text-xs px-3 py-1.5 border rounded-full hover:bg-slate-50 flex items-center gap-1">
-                      <Lightbulb className="h-3 w-3" /> Show visually
-                    </button>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <Brain className="h-4 w-4 text-white" />
                   </div>
                 )}
-              </div>
-              {msg.role === 'user' && (
-                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
-                  <User className="h-4 w-4" />
+                <div className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user' ? 'msg-user rounded-br-sm' : 'msg-assistant rounded-bl-sm'}`}>
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</div>
+                  {msg.role === 'assistant' && (
+                    <div className="mt-3 flex gap-2 flex-wrap">
+                      <button onClick={handleDontGetIt} className="text-xs px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/5 transition-all flex items-center gap-1 text-white/50 hover:text-white">
+                        <HelpCircle className="h-3 w-3" /> I still don't get it
+                      </button>
+                      <button className="text-xs px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/5 transition-all flex items-center gap-1 text-white/50 hover:text-white">
+                        <Lightbulb className="h-3 w-3" /> Show visually
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+                {msg.role === 'user' && (
+                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <User className="h-4 w-4 text-white/60" />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
-          {isTyping && (
-            <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
-                <Brain className="h-4 w-4 text-white" />
-              </div>
-              <div className="bg-white border p-4 rounded-2xl rounded-bl-sm">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" />
-                  <div className="w-2 h-2 rounded-full bg-slate-400 animate-bounce delay-100" />
-                  <div className="w-2 h-2 rounded-full bg-slate-400 animate-bounce delay-200" />
-                </div>
-              </div>
-            </div>
-          )}
+          {isTyping && <TypingIndicator />}
           <div ref={scrollRef} />
         </div>
       </div>
 
       {/* Suggested Questions */}
       {messages.length <= 2 && (
-        <div className="max-w-4xl mx-auto px-4 pb-2">
-          <div className="text-xs text-slate-500 mb-2">Suggested questions:</div>
+        <div className="max-w-4xl mx-auto px-6 pb-2">
+          <div className="text-xs text-white/30 mb-2 flex items-center gap-1">
+            <Sparkles className="h-3 w-3" /> Suggested questions
+          </div>
           <div className="flex flex-wrap gap-2">
             {suggestedQuestions.map(q => (
-              <button key={q} onClick={() => sendMessage(q)} className="text-xs px-3 py-1.5 bg-white border rounded-full hover:bg-indigo-50 transition-colors">
+              <button key={q} onClick={() => sendMessage(q)} className="text-xs px-4 py-2 glass rounded-full hover:border-indigo-500/50 hover:bg-indigo-500/10 transition-all text-white/50 hover:text-white">
                 {q}
               </button>
             ))}
@@ -158,16 +173,20 @@ export default function Tutor() {
       )}
 
       {/* Input */}
-      <div className="border-t bg-white p-4">
+      <div className="border-t border-white/5 bg-[#06060a]/80 backdrop-blur-xl p-4">
         <div className="max-w-4xl mx-auto flex gap-2">
           <input
             placeholder="Ask your Grade Coach anything..."
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
-            className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="input-glass flex-1"
           />
-          <button onClick={() => sendMessage(input)} disabled={!input.trim()} className="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+          <button
+            onClick={() => sendMessage(input)}
+            disabled={!input.trim()}
+            className="px-5 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all disabled:opacity-30 disabled:hover:shadow-none"
+          >
             <Send className="h-4 w-4" />
           </button>
         </div>
